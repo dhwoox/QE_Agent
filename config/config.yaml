@@ -1,0 +1,114 @@
+# QE Agent 설정 파일
+
+# LLM 설정 (LM Studio)
+llm:
+  base_url: "http://127.0.0.1:1234/v1"
+  model: "qwen-coder-30b"
+  api_key: "lm-studio"  # LM Studio는 dummy key 사용
+
+  # Temperature 설정 (작업별)
+  temperature:
+    code_generation: 0.1      # 코드 생성 (정확성 우선)
+    search: 0.7               # 검색 및 분석 (다양성)
+    review: 0.3               # 코드 리뷰 (일관성)
+
+  # 기타 파라미터
+  max_tokens: 4096
+  timeout: 120
+
+# RAG 설정 (ChromaDB)
+rag:
+  # ChromaDB 경로
+  chroma_db_path: "../path/to/your/chroma_db"  # 실제 경로로 변경 필요
+  collection_name: "jira_test_cases"
+
+  # Embedding 모델
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+  # 검색 파라미터
+  search:
+    top_k: 5                  # 상위 N개 결과 반환
+    similarity_threshold: 0.7  # 유사도 임계값
+
+# Long-term Memory 설정 (MongoDB - Optional)
+memory:
+  enabled: false  # MongoDB 사용 여부
+  mongodb_uri: "mongodb://localhost:27017"
+  database_name: "gsdk_agent_memory"
+
+  # Collections
+  collections:
+    tasks: "tasks"                      # 완료된 작업 이력
+    patterns: "patterns"                # 학습된 패턴
+    user_preferences: "user_preferences"  # 사용자 선호도
+
+# Checkpointer 설정 (SQLite)
+checkpointer:
+  enabled: true
+  sqlite_path: "checkpoints/checkpoints.db"
+  auto_save: true  # 자동 저장 여부
+
+# GSDK 경로 설정
+gsdk:
+  # GSDK Python Demo 경로
+  demo_path: "../path/to/gsdk-client/python/demo"  # 실제 경로로 변경 필요
+
+  # 리소스 파일 경로
+  paths:
+    example: "../path/to/gsdk-client/python/example"  # example 폴더
+    biostar_service: "../path/to/gsdk-client/python/biostar/service"  # pb2 파일들
+    biostar_proto: "../path/to/gsdk-client/python/biostar/proto"  # proto 파일들
+
+  # 출력 경로
+  output:
+    test_path: "../path/to/gsdk-client/python/demo/test"  # 생성된 테스트 저장 경로
+
+# Workflow 설정
+workflow:
+  max_iterations: 10  # 최대 반복 횟수
+
+  # Agent별 timeout (초)
+  timeouts:
+    finder: 60
+    generator: 120
+    reviewer: 60
+    executor: 30
+    memory: 30
+
+# Human-in-the-loop 설정
+human_in_loop:
+  enabled: true  # 사용자 승인 요청 활성화
+
+  # 승인이 필요한 작업
+  require_approval_for:
+    - "write_file"       # 파일 저장
+    - "bash_command"     # 명령 실행
+    - "delete_file"      # 파일 삭제 (향후)
+
+# Logging 설정
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  # 로그 파일
+  file:
+    enabled: true
+    path: "logs/qe_agent.log"
+    max_bytes: 10485760  # 10MB
+    backup_count: 5
+
+# Monitoring 설정 (LangSmith - Optional)
+monitoring:
+  langsmith:
+    enabled: false  # LangSmith 사용 여부
+    api_key: ""     # LangSmith API Key
+    project_name: "qe-agent-gsdk"
+
+# Agent별 System Prompt 경로
+prompts:
+  orchestrator: "config/prompts/orchestrator_prompt.txt"
+  finder: "config/prompts/finder_prompt.txt"
+  generator: "config/prompts/generator_prompt.txt"
+  reviewer: "config/prompts/reviewer_prompt.txt"
+  executor: "config/prompts/executor_prompt.txt"
+  memory: "config/prompts/memory_prompt.txt"
